@@ -11,7 +11,7 @@ import { dbOptions } from './config/db';
 import { ENVIRONMENT } from './utils/secrets';
 import {RegisterableController} from "./controller/RegisterableController";
 import {container} from "./config/inversify";
-import Types from './config/types';
+import {Types} from './config/types';
 import {Error} from "tslint/lib/error";
 import { logger } from './utils/logger';
 

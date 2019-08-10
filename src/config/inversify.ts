@@ -1,6 +1,6 @@
-import { Container } from "inversify";
-import { RegisterableController } from "../controller/RegisterableController";
-import Types from './types';
+import {Container} from "inversify";
+import {RegisterableController} from "../controller/RegisterableController";
+import {Types}from './types';
 import {UserService, UserServiceImpl} from "../service/userService";
 import {UserRepository} from "../repository/userRepository";
 import ZipperController from "../controller/ZipperController";

@@ -8,10 +8,15 @@ import {upload} from "../utils/multer";
 import {User} from "../entity/user";
 import {UploadedFiles} from "../entity/uploadedfiles";
 import {UserService} from "../service/userService";
-import Types from "../config/types";
+import {API_URL, FOLDER_NAMES, MESSAGES, Types} from "../config/types";
 import {UploadedfilesService} from "../service/uploadedfilesService";
-import {logger} from "../utils/logger";
+import path from "path";
 
+/**
+ * ZipperController is a controller class which contains API's to upload file
+ * and convert these uploaded files into zip file which are then sent back to
+ * the client.
+ */
 @injectable()
 export class ZipperController implements RegisterableController {
 
@@ -23,11 +28,33 @@ export class ZipperController implements RegisterableController {
 
   public register(app: Application): void {
 
-    app.route('/downloadZip')
+    /**
+     * downloadFiles API receives a parameter id and gets the file names that
+     * belongs to this id, zip these files and send that the zip file on to
+     * the client
+     */
+    app.route(`${API_URL.DOWNLOAD_FILES}/:id`)
       .get( async (req: Request, res: Response, next: NextFunction) => {
         const archive = archiver("zip");
+        const id: string = req.params.id;
 
         try {
+
+          const uploadedFiles: UploadedFiles[] = await this.uploadedfilesService.getUploadedFilesById(id);
+
+          // If files are not found send a file not message to the client
+          if(uploadedFiles.length === 0) {
+            return dataResponse(res, `${MESSAGES.FILES_NOT_FOUND} ${id}`);
+          }
+
+          let files: string[] = [];
+
+          let uploadFolder: string = `${path.resolve(`./${FOLDER_NAMES.UPLOAD}`)}/`;
+
+          uploadedFiles.forEach((file: UploadedFiles) => {
+            files.push(`${uploadFolder}${file.fileName}`);
+          });
+
           archive.on("error", (err) => {
             res.status(500).send({error: err.message});
           });
@@ -38,32 +65,33 @@ export class ZipperController implements RegisterableController {
           });
 
           //set the archive name
-          res.attachment('archive-name.zip');
+          res.attachment('archive.zip');
 
           //this is the streaming magic
           archive.pipe(res);
-
-          const files = ["", ""];
 
           for(let i in files) {
             archive.file(files[i], { name: p.basename(files[i]) });
           }
 
-          var directories = ['']
+          var directories = [`${uploadFolder}zipfiles`]
 
           for(let i in directories) {
-            archive.directory(directories[i], directories[i].replace('', ''));
+            archive.directory(directories[i], directories[i].replace(`${uploadFolder}`, ''));
           }
 
-          const finalArchive = await archive.finalize();
+          await archive.finalize();
 
-          console.log(finalArchive);
         } catch (e) {
           return next(e);
         }
       });
 
-    app.route('/uploadFiles')
+    /**
+     * uploadFiles API uploads the files on to uploads folder and also creates an entry
+     * in the db with user information.
+     */
+    app.route(API_URL.UPLOAD_FILES)
       .post(upload.array('file', 5), async (req: Request, res: Response, next: NextFunction) => {
         try {
           const fileInfo: any = req.files;
@@ -84,6 +112,9 @@ export class ZipperController implements RegisterableController {
 
           const message: string = await this.uploadedfilesService.save(user.uploadedfiles);
 
+          if(message === MESSAGES.FILES_UPDATED_SUCCESSFULLY) {
+            return dataResponse(res, `${MESSAGES.PLEASE_EXECUTE_THE_API} ${user.id}`);
+          }
           return dataResponse(res, message);
         } catch (e) {
           return next(e);
