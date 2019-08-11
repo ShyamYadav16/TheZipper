@@ -1,5 +1,5 @@
 import { ConnectionOptions } from 'typeorm';
-import { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_LOGGING } from '../utils/secrets';
+import { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, DB_LOGGING, ENVIRONMENT } from '../utils/secrets';
 import { User } from '../entity/user';
 import {UploadedFiles} from "../entity/uploadedfiles";
 
@@ -14,5 +14,6 @@ export const dbOptions: ConnectionOptions = {
     User, UploadedFiles
   ],
   logging: DB_LOGGING,
-  synchronize: true
+  synchronize: true,
+  dropSchema: (ENVIRONMENT === "test") ? true : false
 };

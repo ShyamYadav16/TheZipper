@@ -1,6 +1,6 @@
 import {RegisterableController} from "./RegisterableController";
 import {Application, NextFunction, Request, Response} from "express";
-import {dataResponse} from "../utils/response";
+import {badRequestResponse, badRequestValidationResponse, dataResponse} from "../utils/response";
 import {inject, injectable} from "inversify";
 import archiver from "archiver";
 import p from "path";
@@ -11,6 +11,8 @@ import {UserService} from "../service/userService";
 import {API_URL, FOLDER_NAMES, MESSAGES, Types} from "../config/types";
 import {UploadedfilesService} from "../service/uploadedfilesService";
 import path from "path";
+import { validate, ValidationError } from 'class-validator';
+import {logger} from "../utils/logger";
 
 /**
  * ZipperController is a controller class which contains API's to upload file
@@ -39,7 +41,6 @@ export class ZipperController implements RegisterableController {
         const id: string = req.params.id;
 
         try {
-
           const uploadedFiles: UploadedFiles[] = await this.uploadedfilesService.getUploadedFilesById(id);
 
           // If files are not found send a file not message to the client
@@ -101,6 +102,18 @@ export class ZipperController implements RegisterableController {
           user.userName = body.userName;
           user.uploadedfiles = [];
 
+          // validate user entity
+          const errors: ValidationError[] = await validate(user); // errors is an array of validation errors
+
+          if(errors.length > 0) {
+            // return BAD REQUEST status code and errors array
+            logger.error(errors);
+            return badRequestValidationResponse(res, errors);
+          } else if (fileInfo.length === 0) {
+            logger.error(`Error: ${MESSAGES.PLEASE_UPLOAD_FILES}`);
+            return badRequestResponse(res, MESSAGES.PLEASE_UPLOAD_FILES);
+          }
+
           const created: User = await this.userService.save(user);
 
           for (let fileInfoKey in fileInfo) {
@@ -110,12 +123,12 @@ export class ZipperController implements RegisterableController {
             user.uploadedfiles.push(uploadedFiles)
           }
 
-          const message: string = await this.uploadedfilesService.save(user.uploadedfiles);
+          const uf: UploadedFiles[] = await this.uploadedfilesService.save(user.uploadedfiles);
 
-          if(message === MESSAGES.FILES_UPDATED_SUCCESSFULLY) {
-            return dataResponse(res, `${MESSAGES.PLEASE_EXECUTE_THE_API} ${user.id}`);
+          if(uf.length > 0) {
+            return dataResponse(res, `${MESSAGES.PLEASE_EXECUTE_THE_API} ${user.id} ${MESSAGES.TO_DOWNLOAD_ZIP_FILE}`);
           }
-          return dataResponse(res, message);
+          return dataResponse(res, `${MESSAGES.SOMETHING_WENT_WRONG}`);
         } catch (e) {
           return next(e);
         }

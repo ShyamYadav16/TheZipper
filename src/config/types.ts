@@ -23,8 +23,10 @@ export const API_URL = {
 export const MESSAGES = {
   FILES_UPDATED_SUCCESSFULLY: "Files were successfully uploaded!",
   SOMETHING_WENT_WRONG: "Something went wrong in the server, please check the logs for error",
-  PLEASE_EXECUTE_THE_API: "Please execute /downloadZip/:id, with parameter id",
-  FILES_NOT_FOUND: "Files not found for the id"
+  PLEASE_EXECUTE_THE_API: "Please execute GET request using /downloadZip/:id, with parameter id:",
+  TO_DOWNLOAD_ZIP_FILE: "to download zip file",
+  FILES_NOT_FOUND: "Files not found for the id",
+  PLEASE_UPLOAD_FILES: "Please upload files."
 };
 
 // Folder Names

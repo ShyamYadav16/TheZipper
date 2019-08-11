@@ -5,7 +5,7 @@ import {User} from "./user";
 export class UploadedFiles {
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column()
   user_id: number;
@@ -14,9 +14,9 @@ export class UploadedFiles {
   fileName: string;
 
   @Column("timestamp", { precision: 3, default: () => "CURRENT_TIMESTAMP(3)", onUpdate: "CURRENT_TIMESTAMP(3)"})
-  created: Date;
+  created?: Date;
 
   @OneToOne(type => User, user => user.uploadedfiles)
-  user: User;
+  user?: User;
 
 }

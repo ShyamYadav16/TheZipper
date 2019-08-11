@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
 import { Response } from 'express';
+import {ValidationError} from "class-validator";
 
 function data(code: number, success: boolean, message: string) {
   return {
@@ -19,6 +20,10 @@ export function notFoundResponse(res: Response, message: string) {
 
 export function badRequestResponse(res: Response, message: string) {
   return res.status(httpStatus.BAD_REQUEST).json(data(httpStatus.BAD_REQUEST, false, message));
+}
+
+export function badRequestValidationResponse(res: Response, errors: ValidationError[]) {
+  return res.status(httpStatus.BAD_REQUEST).json({code: httpStatus.BAD_REQUEST, success: false, errors: errors});
 }
 
 export function unauthorizeResponse(res: Response, message: string) {

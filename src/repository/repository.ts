@@ -1,4 +1,4 @@
-import { Repository as typeRepository } from 'typeorm';
+import {FindManyOptions, Repository as typeRepository} from 'typeorm';
 import { unmanaged, injectable } from 'inversify';
 
 export interface Repository<T> {
@@ -6,12 +6,12 @@ export interface Repository<T> {
 }
 
 /**
- * This is a Generic repository class which helps to save and get entities
+ * This is a Generic repository class which helps to save and get entity data
  */
 @injectable()
 export abstract class GenericRepositoryImp<TEntity> implements Repository<TEntity> {
 
-  private readonly repository: typeRepository<TEntity>;
+  readonly repository: typeRepository<TEntity>;
 
   public constructor(@unmanaged() repository: typeRepository<TEntity>) {
     this.repository = repository;
@@ -27,13 +27,18 @@ export abstract class GenericRepositoryImp<TEntity> implements Repository<TEntit
     return result;
   }
 
+  public async saveArray(data: any): Promise<TEntity[]> {
+    const result = await this.repository.save(data);
+    return result;
+  }
+
   /**
-   *This method receives where conditions and gets the entity.
+   *This method receives where conditions and gets the entity from db.
    * @param where
    * @returns {Promise<TEntity[]>}
    */
-  public async findManyUsingWhere(where: any): Promise<TEntity[]> {
-    return await this.repository.find({ where });
+  public async findManyUsingWhere(where: FindManyOptions<TEntity>): Promise<TEntity[]> {
+    return await this.repository.find(where);
   }
 
 }

@@ -5,7 +5,7 @@ import {Types, MESSAGES} from "../config/types";
 import {logger} from "../utils/logger";
 
 export interface UploadedfilesService {
-  save(uploadedfiles: UploadedFiles[]): Promise<string>;
+  save(uploadedfiles: UploadedFiles[]): Promise<UploadedFiles[]>;
   getUploadedFilesById(id: string): Promise<UploadedFiles[]>;
 }
 
@@ -24,20 +24,20 @@ export class UploadedfilesServiceImpl implements UploadedfilesService {
    * @param {UploadedFiles[]} uploadedfiles
    * @returns {Promise<string>}
    */
-  public async save(uploadedfiles: UploadedFiles[]): Promise<string> {
-    let message: string;
+  public async save(uploadedfiles: UploadedFiles[]): Promise<UploadedFiles[]> {
+    let created: UploadedFiles[];
     try {
-      let created = await this.uploadedfilesRepository.save(uploadedfiles);
+      created= await this.uploadedfilesRepository.saveArray(uploadedfiles);
 
-      if(created)  {
-        message = MESSAGES.FILES_UPDATED_SUCCESSFULLY;
-      } else {
-        message = MESSAGES.SOMETHING_WENT_WRONG;
-      }
+      // if(created.length > 0)  {
+      //   message = MESSAGES.FILES_UPDATED_SUCCESSFULLY;
+      // } else {
+      //   message = MESSAGES.SOMETHING_WENT_WRONG;
+      // }
     } catch (e) {
       logger.error(e)
     }
-    return message;
+    return created;
   }
 
   /**
@@ -48,7 +48,7 @@ export class UploadedfilesServiceImpl implements UploadedfilesService {
   public async getUploadedFilesById(id: string): Promise<UploadedFiles[]> {
     let uploadedFiles: UploadedFiles[];
     try {
-      uploadedFiles = await this.uploadedfilesRepository.findManyUsingWhere({user_id: id});
+      uploadedFiles = await this.uploadedfilesRepository.findManyUsingWhere({where: {user_id: id}});
     } catch (e) {
      logger.error(e);
     }
