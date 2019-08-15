@@ -1,43 +1,43 @@
+import "reflect-metadata";
 import {UploadedfilesService, UploadedfilesServiceImpl} from "../../src/service/uploadedfilesService";
-import UploadedFilesBuilder from "../utils/uploadedFilesBuilder";
+import UploadedFilesTestBuilder from "../utils/uploadedFilesTestBuilder";
+import {json, Response} from "express";
 import {createConnection} from "typeorm";
 import {dbOptions} from "../../src/config/db";
-import {MESSAGES} from "../../src/config/types";
+import {UploadedFiles} from "../../src/entity/uploadedfiles";
 
 beforeAll(async () => {
   await createConnection(dbOptions);
-})
+});
 
-describe('test uploadedFiles service', () => {
+describe('test uploaded files service', () => {
 
-  let ufService: UploadedfilesService;
+  let uploadedfilesService: UploadedfilesService;
 
-  it('should return uploaded files', async () => {
-    let mock = UploadedFilesBuilder.getMock(2);
-    ufService = new UploadedfilesServiceImpl(mock);
-
-    let result = await ufService.getUploadedFilesById("1");
-
-    expect(mock.findManyUsingWhere).toHaveBeenCalled();
-    expect(result.length).toBe(2);
-  })
+  const fileInfo = [
+    {
+      fileName: "abc0.txt"
+    },
+    {
+      fileName: "abc1.txt"
+    }
+  ]
 
   it('should save uploaded files', async () => {
-    let mock = UploadedFilesBuilder.getMock(2);
-    ufService = new UploadedfilesServiceImpl(mock);
+    let mock = UploadedFilesTestBuilder.getMockBuilder();
+    uploadedfilesService = new UploadedfilesServiceImpl(mock);
 
-    let result = await ufService.save(UploadedFilesBuilder.createListOfDefaultUploadedFiles(2));
-    expect(mock.saveArray).toHaveBeenCalled();
-    expect(result.length).toEqual(2);
+    const uploadedFiles: UploadedFiles[] = await uploadedfilesService.save(fileInfo, 1);
+    expect(mock.with).toHaveBeenCalled();
+    expect(uploadedFiles.length).toBe(2);
   });
 
-  it('should save zero uploaded files', async () => {
-    let mock = UploadedFilesBuilder.getMock(0);
-    ufService = new UploadedfilesServiceImpl(mock);
-
-    let result = await ufService.save(UploadedFilesBuilder.createListOfDefaultUploadedFiles(0));
-    expect(mock.saveArray).toHaveBeenCalled();
-    expect(result.length).toEqual(0);
-  });
+  // it('should download files', async () => {
+  //   let mock = UploadedFilesTestBuilder.getMockBuilder();
+  //   uploadedfilesService = new UploadedfilesServiceImpl(mock);
+  //
+  //   await uploadedfilesService.download("1", res);
+  //   expect(mock.withId).toHaveBeenCalled();
+  // });
 
 });

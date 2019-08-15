@@ -1,11 +1,10 @@
 import {User} from "../entity/user";
 import {inject, injectable} from "inversify";
 import {Types} from '../config/types';
-import {UserRepository} from "../repository/userRepository";
-import {logger} from "../utils/logger";
+import {UserBuilder} from "../builder/userBuilder";
 
 export interface UserService {
-  save(user: User): Promise<User>;
+  save(userName: string): Promise<number>;
 }
 
 
@@ -16,7 +15,7 @@ export interface UserService {
 export class UserServiceImpl implements UserService {
 
   constructor(
-    @inject(Types.UserRepository) private userRepoistory: UserRepository
+    @inject(Types.UserBuilder) private userBuilder: UserBuilder
   ) {}
 
   /**
@@ -24,14 +23,10 @@ export class UserServiceImpl implements UserService {
    * @param {User} user
    * @returns {Promise<User>}
    */
-  public async save(user: User): Promise<User> {
-    let created;
-    try {
-      created = await this.userRepoistory.save(user);
-    } catch (e) {
-      logger.error(e);
-    }
-    return created;
+  public async save(userName: string): Promise<number> {
+    let userBuilder: UserBuilder = await this.userBuilder.with(userName);
+    return await userBuilder.build();
   }
 
 }
+

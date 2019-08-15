@@ -1,12 +1,12 @@
 import {UploadedFiles} from "../entity/uploadedfiles";
 import {inject, injectable} from "inversify";
-import {UploadedfilesRepository} from "../repository/uploadedfilesRepository";
-import {Types, MESSAGES} from "../config/types";
-import {logger} from "../utils/logger";
+import {Types} from "../config/types";
+import {UploadedfilesBuilder} from "../builder/uploadedfilesBuilder";
+import {Response} from "express";
 
 export interface UploadedfilesService {
-  save(uploadedfiles: UploadedFiles[]): Promise<UploadedFiles[]>;
-  getUploadedFilesById(id: string): Promise<UploadedFiles[]>;
+  save(fileInfo: any, user_id: number): Promise<UploadedFiles[]>;
+  download(id: string, res: Response): void;
 }
 
 /**
@@ -16,7 +16,7 @@ export interface UploadedfilesService {
 export class UploadedfilesServiceImpl implements UploadedfilesService {
 
   constructor(
-    @inject(Types.UploadedFilesRepository) private uploadedfilesRepository: UploadedfilesRepository
+    @inject(Types.UploadedfilesBuilder) private uploadedfilesBuilder: UploadedfilesBuilder
   ) {}
 
   /**
@@ -24,35 +24,22 @@ export class UploadedfilesServiceImpl implements UploadedfilesService {
    * @param {UploadedFiles[]} uploadedfiles
    * @returns {Promise<string>}
    */
-  public async save(uploadedfiles: UploadedFiles[]): Promise<UploadedFiles[]> {
-    let created: UploadedFiles[];
-    try {
-      created= await this.uploadedfilesRepository.saveArray(uploadedfiles);
-
-      // if(created.length > 0)  {
-      //   message = MESSAGES.FILES_UPDATED_SUCCESSFULLY;
-      // } else {
-      //   message = MESSAGES.SOMETHING_WENT_WRONG;
-      // }
-    } catch (e) {
-      logger.error(e)
+  public async save(fileInfo: any, user_id: number): Promise<UploadedFiles[]> {
+    let fileNames: string[] = [];
+    for (let fileInfoKey in fileInfo) {
+      fileNames.push(fileInfo[fileInfoKey].filename)
     }
-    return created;
+    let uploadedFilesBuilder: UploadedfilesBuilder = await this.uploadedfilesBuilder.with(fileNames, user_id);
+    return await uploadedFilesBuilder.build();
   }
 
   /**
-   * This method gets the saved files by user_id
+   * This method downloads the file by user id
    * @param {string} id
    * @returns {Promise<UploadedFiles[]>}
    */
-  public async getUploadedFilesById(id: string): Promise<UploadedFiles[]> {
-    let uploadedFiles: UploadedFiles[];
-    try {
-      uploadedFiles = await this.uploadedfilesRepository.findManyUsingWhere({where: {user_id: id}});
-    } catch (e) {
-     logger.error(e);
-    }
-    return uploadedFiles;
+  public async download(id: string, res: Response) {
+    await this.uploadedfilesBuilder.withId(id, res).download();
   }
 
 }

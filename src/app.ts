@@ -11,12 +11,13 @@ import { dbOptions } from './config/db';
 import { ENVIRONMENT } from './utils/secrets';
 import {RegisterableController} from "./controller/RegisterableController";
 import {container} from "./config/inversify";
-import {Types} from './config/types';
+import {MESSAGES, Types} from './config/types';
 import {Error} from "tslint/lib/error";
 import { logger } from './utils/logger';
 
 import { NotFound, BadRequest, Unauthorize, Conflict } from './utils/exceptions';
 import { notFoundResponse, badRequestResponse, unauthorizeResponse, conflictResponse, internalResponse } from './utils/response';
+import {ValidationError} from "class-validator";
 
 export default class App {
 
@@ -40,6 +41,9 @@ export default class App {
 
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       logger.error(err.stack);
+      if(err.message === MESSAGES.FILE_TOO_LARGE) {
+        return badRequestResponse(res, err.message);
+      }
       if (err instanceof NotFound) {
         return notFoundResponse(res, err.message);
       }

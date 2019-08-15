@@ -1,6 +1,11 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 
+/**
+ * This method helps in getting the environment from
+ * @param {string} path
+ * @param {string} env
+ */
 function getEnvironment(path: string, env: string) {
   if (fs.existsSync(path)) {
     console.log(`Using ${env} environment variables`);
@@ -32,6 +37,8 @@ export const DB_PORT = Number(process.env.DB_PORT);
 export const DB_USER = process.env.DB_USER;
 export const DB_PASSWORD = process.env.DB_PASSWORD;
 export const DB_LOGGING = process.env.DB_LOGGING === 'true';
+export const DB_SYNCHRONIZE = process.env.DB_LOGGING === process.env.DB_SYNCHRONIZE;
+export const DB_DROP_SCHEMA = process.env.DB_LOGGING === process.env.DB_DROP_SCHEMA;
 
 /**
  * Winston logger

@@ -1,11 +1,12 @@
 import { User } from '../../src/entity/user';
-import {getRepository} from "typeorm";
+import {UserBuilder, UserBuilderImpl} from "../../src/builder/userBuilder";
 import {UserRepository} from "../../src/repository/userRepository";
-import UploadedFilesBuilder from "./uploadedFilesBuilder";
+import {getRepository} from "typeorm";
+import {Response} from "express-serve-static-core";
 
 export default class UserTestBuilder {
 
-  private user: User = new User();
+  private user: User = new User("shyam");
 
   public static newUser() {
     return new UserTestBuilder();
@@ -41,12 +42,20 @@ export default class UserTestBuilder {
     return result;
   }
 
-  public static getMock() {
+  public static getMockRepo() {
     const Mock = jest.fn<UserRepository, []>(() => ({
       findManyUsingWhere: jest.fn().mockReturnValue(this.createUser()),
       save: jest.fn().mockReturnValue(this.createUser()),
       saveArray: jest.fn().mockReturnValue(this.createListOfDefaultUsers(2)),
       repository: getRepository(User)
+    }));
+    return new Mock();
+  }
+
+  public static getMockBuilder() {
+    const Mock = jest.fn<UserBuilder, []>(() => ({
+      build: jest.fn().mockReturnValue(1),
+      with: jest.fn().mockReturnValue(new UserBuilderImpl(this.getMockRepo()))
     }));
     return new Mock();
   }

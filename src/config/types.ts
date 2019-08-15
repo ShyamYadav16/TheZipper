@@ -8,7 +8,11 @@ export const Types = {
 
   UploadedFilesRepository: Symbol('UploadedfilesRepository'),
 
-  UploadedFilesService: Symbol('UploadedfilesService')
+  UploadedFilesService: Symbol('UploadedfilesService'),
+
+  UserBuilder: Symbol('UserBuilder'),
+
+  UploadedfilesBuilder: Symbol('UploadedfilesBuilder')
 
 };
 
@@ -26,7 +30,10 @@ export const MESSAGES = {
   PLEASE_EXECUTE_THE_API: "Please execute GET request using /downloadZip/:id, with parameter id:",
   TO_DOWNLOAD_ZIP_FILE: "to download zip file",
   FILES_NOT_FOUND: "Files not found for the id",
-  PLEASE_UPLOAD_FILES: "Please upload files."
+  PLEASE_UPLOAD_FILES: "Please upload files.",
+  FILE_TOO_LARGE: "File too large",
+  SUCCESS: "success",
+  CRON_CONFIG: "0 0 */1 * * *"
 };
 
 // Folder Names

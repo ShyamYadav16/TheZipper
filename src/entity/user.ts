@@ -6,16 +6,20 @@ import {Length} from "class-validator";
 export class User {
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
   @Column("varchar")
   @Length(3, 20)
   userName: string;
 
   @Column("timestamp", { precision: 3, default: () => "CURRENT_TIMESTAMP(3)", onUpdate: "CURRENT_TIMESTAMP(3)"})
-  created: Date;
+  created?: Date;
 
   @OneToMany(type => UploadedFiles, uploadedfiles => uploadedfiles.user_id)
-  uploadedfiles: UploadedFiles[];
+  uploadedfiles?: UploadedFiles[];
+
+  constructor(userName: string) {
+    this.userName = userName;
+  }
 
 }
