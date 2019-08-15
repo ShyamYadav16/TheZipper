@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import App from './app';
+import * as cronJobs from './cron-jobs';
 
 process.on('uncaughtException', (err) => {
   console.error(`
@@ -21,4 +22,6 @@ process.on('unhandledRejection', (err) => {
 
 const app: App = new App();
 app.start();
-module.exports = app;
+export default app;
+
+cronJobs.jobs.scheduleJob();
