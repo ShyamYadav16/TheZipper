@@ -1,10 +1,8 @@
 import {UserBuilder, UserBuilderImpl} from "../../src/builder/userBuilder";
-import {Connection, createConnection, getConnection} from "typeorm";
+import {createConnection} from "typeorm";
 import UserTestBuilder from "../utils/userTestBuilder";
 import {dbOptions} from "../../src/config/db";
-import httpStatus from "http-status";
 import {ValidationError} from "class-validator";
-import {NextFunction, Response} from "express";
 
 beforeAll(async () => {
   await createConnection(dbOptions);

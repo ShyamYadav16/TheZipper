@@ -1,6 +1,7 @@
 import {Request} from "express";
 import multer from 'multer';
 import {FOLDER_NAMES} from "../config/types";
+import fs from "fs";
 
 /**
  * Creating a storage unit on the disk and also appending the file name with
@@ -9,6 +10,9 @@ import {FOLDER_NAMES} from "../config/types";
  */
 const storage = multer.diskStorage({
   destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+    if (!fs.existsSync(FOLDER_NAMES.UPLOAD)) {
+      fs.mkdirSync(FOLDER_NAMES.UPLOAD);
+    }
     cb(null, FOLDER_NAMES.UPLOAD);
   },
   filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {

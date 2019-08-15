@@ -35,6 +35,7 @@ export class ZipperController implements RegisterableController {
         try {
           await this.uploadedfilesService.download(id, res);
         } catch (e) {
+          logger.error(e);
           // Returns the error that is thrown in /downloadFiles/:id API
           return badRequestResponse(res, e);
         }
@@ -65,6 +66,7 @@ export class ZipperController implements RegisterableController {
           // Returns Error if the files are not uploaded
           return dataResponse(res, `${MESSAGES.SOMETHING_WENT_WRONG}`);
         } catch (e) {
+          logger.error(e);
           // Returns the error that is thrown from inside /uploadFiles API
           return badRequestResponse(res, e);
         }

@@ -15,9 +15,6 @@ export interface UserBuilder {
 @injectable()
 export class UserBuilderImpl implements UserBuilder {
 
-  // @inject(Types.UserRepository)
-  // private userRepository: UserRepository;
-
   constructor(
     @inject(Types.UserRepository) private userRepository: UserRepository
   ) {}

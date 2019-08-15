@@ -17,7 +17,6 @@ import { logger } from './utils/logger';
 
 import { NotFound, BadRequest, Unauthorize, Conflict } from './utils/exceptions';
 import { notFoundResponse, badRequestResponse, unauthorizeResponse, conflictResponse, internalResponse } from './utils/response';
-import {ValidationError} from "class-validator";
 
 export default class App {
 

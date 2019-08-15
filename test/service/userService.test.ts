@@ -1,6 +1,5 @@
 import {createConnection} from "typeorm";
 import {dbOptions} from "../../src/config/db";
-import {UserBuilder, UserBuilderImpl} from "../../src/builder/userBuilder";
 import UserTestBuilder from "../utils/userTestBuilder";
 import {UserService, UserServiceImpl} from "../../src/service/userService";
 
