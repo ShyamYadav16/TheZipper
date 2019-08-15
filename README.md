@@ -63,6 +63,8 @@ Currently the cron-job has been configured to run every 1hr, you can change this
 
 ## RESTful API
 
+Please use https://documenter.getpostman.com/view/2600779/SVYxob9S or you can use any web service testing tools to test the same by using below APIs.
+
 * /uploadFiles   -X HTTP POST (To upload the files on to upload folder and user data on to db).
 * /downloadZip/:id -X HTTP GET (To download zip file based on the User ID)
 
